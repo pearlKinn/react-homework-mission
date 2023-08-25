@@ -1,0 +1,36 @@
+.Default {
+  background-color: #e300bf;
+  color: #ffffff;
+  border-radius: 20px;
+  border: none;
+  width: 100px;
+  height: 36px;
+}
+
+.Hover {
+  background-color: #e300bf;
+  border: solid 0.5px #ffffff;
+  border-radius: 20px;
+  width: 100px;
+  color: white;
+  height: 36px;
+}
+
+.OnClick {
+  background-color: #fff;
+  color: #e300bf;
+  border-radius: 20px;
+  border: none;
+  width: 100px;
+  height: 36px;
+}
+
+.buttonWrapper {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
+.description {
+  color: white;
+}
