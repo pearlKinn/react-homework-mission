@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 function Nav() {
   return (
     <nav>
-      <ul className="flex gap-4 p-5 font-extralight">
+      <ul className="flex gap-4 p-5">
         <li>
           <NavLink
             to="/techit"

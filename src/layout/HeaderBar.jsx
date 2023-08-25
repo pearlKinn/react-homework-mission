@@ -1,6 +1,7 @@
 import Heading from '@/components/Heading';
 import Nav from './Nav';
 import Button from '@/components/Button';
+import { Link } from 'react-router-dom';
 
 function HeaderBar() {
   return (
@@ -9,7 +10,7 @@ function HeaderBar() {
         <Heading />
         <Nav />
       </div>
-      <Button status={'로그인'}></Button>
+      <Link to="/login" className='font-semibold'>로그인</Link>
     </header>
   );
 }

@@ -8,18 +8,20 @@ import Home from './pages/Home';
 import Track from './pages/Track';
 import Station from './pages/Station';
 import TECHIT from './pages/Techit';
+import Login from './pages/Login';
+import Register from './pages/Register';
 
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <RootLayout />,
-    // 중첩된 라우트
-    children: [
-      { index: true, element: <Home /> },
-      { path: 'techit', element: <TECHIT /> },
-      { path: 'track', element: <Track /> },
-      { path: 'station', element: <Station /> },
-    ],
-  },
-]);
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path="/" element={<RootLayout />}>
+      <Route index element={<Home />} />
+      <Route path="login" element={<Login />} />
+      <Route path="users/register" element={<Register />} />
+      <Route path="techit" element={<TECHIT />} />
+      <Route path="track" element={<Track />} />
+      <Route path="station" element={<Station />} />
+    </Route>
+  )
+);
+
 export default router;
