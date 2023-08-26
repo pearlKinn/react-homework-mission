@@ -1,6 +1,5 @@
 import { createContext, useEffect, useState, useContext } from "react";
 import pb from "@/api/pocketbase";
-import { string, node } from "prop-types";
 import useStorage from "@/hooks/useStorage";
 
 const AuthContext = createContext();
@@ -70,11 +69,6 @@ function AuthProvider({ displayName = "AuthProvider", children }) {
     </AuthContext.Provider>
   );
 }
-
-AuthProvider.propTypes = {
-  displayName: string,
-  children: node.isRequired, 
-};
 
 export default AuthProvider;
 

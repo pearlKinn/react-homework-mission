@@ -1,10 +1,10 @@
+import { useEffect, useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import pb from '@/api/pocketbase';
 import Logo from '@/components/Logo';
-import debounce from '@/utils/debounce';
 import { emailReg, pwReg } from '@/utils/validation';
-import { useEffect } from 'react';
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import debounce from '@/utils/debounce';
+import { toast } from 'react-hot-toast';
 
 function Login() {
   const [emailError, setEmailError] = useState('');
@@ -38,14 +38,26 @@ function Login() {
 
   const handleSignIn = async (e) => {
     e.preventDefault();
-    const { email, password } = formState;
 
+    const { email, password } = formState;
     try {
       await pb.collection('users').authWithPassword(email, password);
-      console.log('성공');
-      // navigate('/');
+      toast.success('로그인에 성공했습니다', {
+        position: 'top-center',
+        ariaProps: {
+          role: 'status',
+          'aria-live': 'polite',
+        },
+      });
+      navigate('/');
     } catch (error) {
-      console.log('gkdl');
+      toast.error('로그인에 실패하였습니다', {
+        position: 'top-center',
+        ariaProps: {
+          role: 'alert',
+          'aria-live': 'polite',
+        },
+      });
       console.error(error);
     }
   };
