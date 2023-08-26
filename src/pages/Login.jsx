@@ -1,40 +1,34 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
 import pb from '@/api/pocketbase';
+import Alert from '@/components/Alert';
 import Logo from '@/components/Logo';
-import { emailReg, pwReg } from '@/utils/validation';
 import debounce from '@/utils/debounce';
+import { emailReg, pwReg } from '@/utils/validation';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Login() {
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
   const navigate = useNavigate();
-
   const [formState, setFormState] = useState({
     email: '',
     password: '',
   });
 
+  let emailError = '';
+  let passwordError = '';
   const isActive = !!(formState.email && formState.password);
 
-  useEffect(() => {
-    if (!formState.email) {
-      setEmailError('이메일을 입력해주세요.');
-    } else if (!emailReg(formState.email)) {
-      setEmailError('올바른 이메일 형식을 입력해주세요');
-    } else {
-      setEmailError('');
-    }
+  if (!formState.email) {
+    emailError = '이메일을 입력해주세요.';
+  } else if (!emailReg(formState.email)) {
+    emailError = '올바른 이메일 형식을 입력해주세요';
+  }
 
-    if (!formState.password) {
-      setPasswordError('비밀번호를 입력해주세요.');
-    } else if (!pwReg(formState.password)) {
-      setPasswordError('6~16자의 영문, 숫자, 특수문자를 포함해주세요.');
-    } else {
-      setPasswordError('');
-    }
-  }, [formState]);
+  if (!formState.password) {
+    passwordError = '비밀번호를 입력해주세요.';
+  } else if (!pwReg(formState.password)) {
+    passwordError = '6~16자의 영문, 숫자, 특수문자를 포함해주세요.';
+  }
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -73,6 +67,8 @@ function Login() {
 
   const handleDebounceInput = debounce(handleInput, 500);
 
+  // const handleBlur = 
+
   return (
     <div
       role="screenWrapper"
@@ -100,24 +96,7 @@ function Login() {
               />
               {formState.email && (
                 <div className="flex gap-1 mt-2 text-xs lg:text-sm text-red-500">
-                  {emailReg(formState.email) ? (
-                    ''
-                  ) : (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      stroke="currentColor"
-                      className="w-4 h-auto"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 8v4m0 4h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"
-                      />
-                    </svg>
-                  )}
+                  {emailReg(formState.email) ? '' : <Alert />}
                   {emailError}
                 </div>
               )}
@@ -133,24 +112,7 @@ function Login() {
                 />
                 {formState.password && (
                   <div className="flex gap-1 mt-2 text-xs lg:text-sm text-red-500">
-                    {pwReg(formState.password) ? (
-                      ''
-                    ) : (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        stroke="currentColor"
-                        className="w-4 h-auto"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 8v4m0 4h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"
-                        />
-                      </svg>
-                    )}
+                    {pwReg(formState.password) ? '' : <Alert />}
                     {passwordError}
                   </div>
                 )}
