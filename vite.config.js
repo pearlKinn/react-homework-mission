@@ -7,6 +7,7 @@ const idDev = env.NODE_ENV
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '/react-homework-mission03/',
   plugins: [react()],
   css: {
     devSourcemap: true,
