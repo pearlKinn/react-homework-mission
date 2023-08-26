@@ -5,11 +5,11 @@ import {
 } from 'react-router-dom';
 import RootLayout from './layout/RootLayout';
 import Home from './pages/Home';
-import Track from './pages/Track';
-import Station from './pages/Station';
-import TECHIT from './pages/Techit';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Station from './pages/Station';
+import TECHIT from './pages/Techit';
+import Track from './pages/Track';
 
 const router = createBrowserRouter(
   createRoutesFromElements(

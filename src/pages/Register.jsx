@@ -1,36 +1,66 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import pb from '@/api/pocketbase';
-import { Link } from 'react-router-dom';
-import debounce from '@/utils/debounce';
+import Alert from '@/components/Alert';
 import Logo from '@/components/Logo';
+import debounce from '@/utils/debounce';
+import { emailReg, hasNumber, pwReg } from '@/utils/validation';
+import { useState } from 'react';
+import { toast } from 'react-hot-toast';
+import { Link, useNavigate } from 'react-router-dom';
 
 function SignUp() {
   const navigate = useNavigate();
 
   const [formState, setFormState] = useState({
     name: '',
-    username: '',
     email: '',
+    phoneNum: '',
     password: '',
     passwordConfirm: '',
   });
 
+  let emailError = '';
+  let passwordError = '';
+  let confirmPwd = '';
+  let samePwd = false;
+  const emailCheck = emailReg(formState.email);
+  const pwdCheck = pwReg(formState.password);
+  const nameCheck = hasNumber(formState.name);
+
+  if (!formState.email) {
+    emailError = '이메일을 입력해주세요.';
+  } else if (!emailCheck) {
+    emailError = '올바른 이메일 형식을 입력해주세요';
+  }
+
+  if (!formState.password) {
+    passwordError = '비밀번호를 입력해주세요.';
+  } else if (!pwdCheck) {
+    passwordError = '6~16자의 영문, 숫자, 특수문자를 포함해주세요.';
+  }
+
+  if (formState.password !== formState.passwordConfirm) {
+    samePwd = false;
+    confirmPwd = '비밀번호가 일치하지 않습니다';
+  } else {
+    samePwd = true;
+  }
+
   const handleRegister = async (e) => {
     e.preventDefault();
-    const { password, passwordConfirm } = formState;
-
-    if (password !== passwordConfirm) {
-      alert('비밀번호가 일치하지 않습니다. 다시 확인해보세요.');
+    if (samePwd && emailCheck && pwdCheck && !nameCheck) {
+      await pb.collection('users').create({
+        ...formState,
+        emailVisibility: true,
+      });
+      toast.success('회원가입에 성공했습니다', {
+        position: 'top-center',
+        ariaProps: {
+          role: 'status',
+          'aria-live': 'polite',
+        },
+      });
+      navigate('/');
     }
-
-    // PocketBase SDK 인증 요청
-    await pb.collection('users').create({
-      ...formState,
-      emailVisibility: true,
-    });
-
-    navigate('/');
   };
 
   const handleInput = (e) => {
@@ -58,34 +88,59 @@ function SignUp() {
           </header>
           <main className="mt-10">
             <h2 className="text-lg font-bold">회원가입</h2>
-            <form>
+            <form onSubmit={handleRegister}>
               <section className="mt-6 space-y-5">
                 <div>
-                  <label htmlFor="name" className="inline-block text-xs font-semibold mb-2">이름</label>
+                  <label
+                    htmlFor="name"
+                    className="inline-block text-xs font-semibold mb-2"
+                  >
+                    이름
+                  </label>
                   <input
                     type="text"
                     name="name"
                     id="name"
                     defaultValue={formState.name}
                     onChange={handleDebounceInput}
-                    className="border border-gray-300 rounded-lg w-full p-3 mt-2 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 focus:ring-0"
+                    className="border border-gray-300 rounded-lg w-full p-3 mt-2 mb-1 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 focus:ring-0"
                     placeholder="이름을 입력해주세요"
                   />
+                  {nameCheck && (
+                    <div className="flex gap-1 text-xs lg:text-sm text-red-500 absolute">
+                      {nameCheck ? <Alert /> : ''}
+                      {'올바른 이름을 입력해주세요'}
+                    </div>
+                  )}
                 </div>
                 <div>
-                  <label htmlFor="email" className="inline-block text-xs font-semibold mb-2">아이디</label>
+                  <label
+                    htmlFor="email"
+                    className="inline-block text-xs font-semibold mb-2"
+                  >
+                    아이디
+                  </label>
                   <input
                     type="email"
                     name="email"
                     id="email"
                     defaultValue={formState.email}
                     onChange={handleDebounceInput}
-                    className="border border-gray-300 rounded-lg w-full p-3 mt-2 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 focus:ring-0"
+                    className="border border-gray-300 rounded-lg w-full p-3 mt-2 mb-1 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 focus:ring-0"
                     placeholder="예) likelion@gmail.com"
                   />
+                  {formState.email && (
+                    <div className="flex gap-1 text-xs lg:text-sm text-red-500 absolute">
+                      {emailCheck ? '' : <Alert />}
+                      {emailError}
+                    </div>
+                  )}
                 </div>
                 <div>
-                  <label htmlFor="phone" className="inline-block text-xs font-semibold mb-2">
+                  <label
+                    htmlFor="phone"
+                    className="inline-block text-xs font-semibold mb-2"
+                  >
                     휴대폰 번호
                   </label>
                   <div className="flex space-x-2">
@@ -93,11 +148,11 @@ function SignUp() {
                       <input
                         type="tel"
                         name="phone"
-                        id='phone'
+                        id="phone"
                         className="border border-gray-300 focus:border-gray-600 block w-full rounded-lg p-3 text-sm placeholder-gray-500 focus:outline-none focus:ring-0"
                         placeholder="-없이 숫자만 입력해주세요."
-                        required=""
-                        defaultValue=""
+                        required
+                        defaultValue={formState.phoneNum}
                       />
                     </div>
                     <button
@@ -116,9 +171,7 @@ function SignUp() {
                         type="text"
                         name="pin"
                         autoComplete="one-time-code"
-                        className="border border-gray-300 focus:border-gray-600 block w-full border-gray-300 rounded-lg p-3 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 focus:ring-0"
-                        readOnly=""
-                        defaultValue=""
+                        className="border block w-full border-gray-300 rounded-lg p-3 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 focus:ring-0"
                       />
                     </div>
                     <button
@@ -134,34 +187,56 @@ function SignUp() {
                   <ul className="mt-2 text-gray-500 text-sm " />
                 </div>
                 <div>
-                  <label htmlFor='password' className="inline-block text-xs font-semibold mb-2">
+                  <label
+                    htmlFor="password"
+                    className="inline-block text-xs font-semibold mb-2"
+                  >
                     비밀번호
                   </label>
                   <input
                     type="password"
                     name="password"
-                    id='password'
-                    className="border rounded-lg border-gray-300 block w-full p-3 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 focus:ring-0"
+                    id="password"
+                    className="border rounded-lg border-gray-300 block w-full mb-1 p-3 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 focus:ring-0"
                     placeholder="영문/숫자/특수문자를 조합 (6 ~ 16자)"
                     required
                     defaultValue={formState.password}
                     onChange={handleDebounceInput}
                   />
+                  {formState.password && (
+                    <div className="flex gap-1 text-xs lg:text-sm text-red-500 absolute">
+                      {pwdCheck ? '' : <Alert />}
+                      {passwordError}
+                    </div>
+                  )}
                 </div>
                 <div>
-                  <label htmlFor='passwordCheck' className="inline-block text-xs font-semibold mb-2">
+                  <label
+                    htmlFor="passwordConfirm"
+                    className="inline-block text-xs font-semibold mb-2"
+                  >
                     비밀번호 확인
                   </label>
                   <input
                     type="password"
-                    name="passwordCheck"
-                    id="passwordCheck"
-                    className="border rounded-lg border-gray-300 block w-full p-3 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 focus:ring-0"
+                    name="passwordConfirm"
+                    id="passwordConfirm"
+                    className="border rounded-lg border-gray-300 block w-full p-3 mb-1 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 focus:ring-0"
                     placeholder="비밀번호를 다시 한 번 입력해주세요"
                     required
-                    defaultValue=""
+                    defaultValue={formState.passwordConfirm}
                     onChange={handleDebounceInput}
                   />
+                  {formState.passwordConfirm && (
+                    <div className="flex gap-1 text-xs lg:text-sm text-red-500 absolute">
+                      {formState.password !== formState.passwordConfirm ? (
+                        <Alert />
+                      ) : (
+                        ''
+                      )}
+                      {confirmPwd}
+                    </div>
+                  )}
                 </div>
               </section>
               <div className="mt-10 flex items-center">
@@ -269,13 +344,17 @@ function SignUp() {
                 </ul>
                 <div className="mt-8">
                   <button
-                    className="flex justify-center py-3 items-center w-full rounded-lg bg-orange-500 bg-opacity-50 cursor-not-allowed"
-                    type="button"
-                    disabled=""
+                    type="submit"
+                    disabled={
+                      !(samePwd && emailCheck && pwdCheck && !nameCheck)
+                    }
+                    className={`flex justify-center py-3 items-center w-full rounded-lg bg-orange-400 outline-none text-white font-semibold ${
+                      samePwd && emailCheck && pwdCheck && !nameCheck
+                        ? ''
+                        : 'opacity-50 cursor-not-allowed'
+                    }`}
                   >
-                    <span className="text-white text-sm font-semibold">
-                      확인
-                    </span>
+                    확인
                   </button>
                 </div>
               </div>
@@ -284,81 +363,6 @@ function SignUp() {
         </div>
       </div>
     </div>
-
-    // <div role="screenWrapper" className="h-screen" >
-    //   <div className='flex justify-center'>
-    //     <div className="my-12 w-80">
-    //       <Link to="/" className="block">
-    //         <Logo width={'135px'} height={'20px'} />
-    //       </Link>
-    //       <main className="mt-10">
-    //         <h2 className="font-semibold text-lg">회원가입</h2>
-    //         <form
-    //           onSubmit={handleRegister}
-    //           className="flex flex-col gap-2 mt-2 justify-start items-start p-3"
-    //         >
-    //           <div>
-
-    //           </div>
-    //           <div>
-
-    //           </div>
-    //           <div>
-    //             <label htmlFor="phoneNumber">휴대폰 번호</label>
-    //             <div className="flex space-x-2 mt-2">
-    //               <div className="w-full">
-    //                 <input
-    //                   type="number"
-    //                   name="phoneNumber"
-    //                   id="phoneNumber"
-    //                   defaultValue={formState.password}
-    //                   onChange={handleDebounceInput}
-    //                   className="border border-gray-300 rounded-lg w-full p-3 mt-2 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 focus:ring-0"
-    //                   placeholder="-없이 숫자만 입력해주세요."
-    //                 />
-    //               </div>
-    //             </div>
-    //             <button
-    //               type="button"
-    //               className="flex-shrink-0 p-3 px-4 text-sm font-semibold
-    //                                               border border-orange-500 rounded-lg
-    //                                               text-orange-500 flex items-center
-    //                                               justify-center"
-    //             >
-    //               인증하기
-    //             </button>
-    //           </div>
-    //           <div>
-    //             <label htmlFor="password">패스워드</label>
-    //             <input
-    //               type="password"
-    //               name="password"
-    //               id="password"
-    //               className="border border-gray-300 rounded-lg w-full p-3 mt-2 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 focus:ring-0"
-    //             />
-    //           </div>
-    //           <div>
-    //             <label htmlFor="passwordConfirm">패스워드 확인</label>
-    //             <input
-    //               type="password"
-    //               name="passwordConfirm"
-    //               id="passwordConfirm"
-    //               defaultValue={formState.passwordConfirm}
-    //               onChange={handleDebounceInput}
-    //               className="border border-gray-300 rounded-lg w-full p-3 mt-2 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 focus:ring-0"
-    //             />
-    //           </div>
-    //           <div className="flex gap-2">
-    //             <button type="submit" className="disabled:cursor-not-allowed">
-    //               가입
-    //             </button>
-    //             <button type="reset">취소</button>
-    //           </div>
-    //         </form>
-    //       </main>
-    //     </div>
-    //   </div>
-    // </div>
   );
 }
 

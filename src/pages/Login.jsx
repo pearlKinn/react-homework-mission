@@ -3,7 +3,7 @@ import Alert from '@/components/Alert';
 import Logo from '@/components/Logo';
 import debounce from '@/utils/debounce';
 import { emailReg, pwReg } from '@/utils/validation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -16,17 +16,19 @@ function Login() {
 
   let emailError = '';
   let passwordError = '';
-  const isActive = !!(formState.email && formState.password);
+  const emailCheck = emailReg(formState.email)
+  const pwdCheck = pwReg(formState.password)
+  const isActive = !!(emailCheck && pwdCheck);
 
   if (!formState.email) {
     emailError = '이메일을 입력해주세요.';
-  } else if (!emailReg(formState.email)) {
+  } else if (!emailCheck) {
     emailError = '올바른 이메일 형식을 입력해주세요';
   }
 
   if (!formState.password) {
     passwordError = '비밀번호를 입력해주세요.';
-  } else if (!pwReg(formState.password)) {
+  } else if (!pwdCheck) {
     passwordError = '6~16자의 영문, 숫자, 특수문자를 포함해주세요.';
   }
 
@@ -67,8 +69,6 @@ function Login() {
 
   const handleDebounceInput = debounce(handleInput, 500);
 
-  // const handleBlur = 
-
   return (
     <div
       role="screenWrapper"
@@ -78,7 +78,7 @@ function Login() {
       <section>
         <div className="flex flex-col items-center pt-12">
           <Link to="/" className="block">
-            <Logo width={'135px'} height={'20px'} className="" />
+            <Logo width={'135px'} height={'20px'} />
           </Link>
           <form onSubmit={handleSignIn} className="w-80">
             <div className="mt-10">
@@ -91,12 +91,12 @@ function Login() {
                 id="email"
                 defaultValue={formState.email}
                 onChange={handleDebounceInput}
-                className="border border-gray-300 rounded-lg w-full p-3 mt-2 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 focus:ring-0"
+                className="border border-gray-300 rounded-lg w-full p-3 mt-2 mb-1 text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 focus:ring-0"
                 placeholder="이메일"
               />
               {formState.email && (
-                <div className="flex gap-1 mt-2 text-xs lg:text-sm text-red-500">
-                  {emailReg(formState.email) ? '' : <Alert />}
+                <div className="flex gap-1 text-xs lg:text-sm text-red-500 absolute">
+                  {emailCheck ? '' : <Alert />}
                   {emailError}
                 </div>
               )}
@@ -107,12 +107,12 @@ function Login() {
                   name="password"
                   defaultValue={formState.password}
                   onChange={handleDebounceInput}
-                  className="border border-gray-300 rounded-lg p-3 mt-2 w-full text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 focus:ring-0"
+                  className="border border-gray-300 rounded-lg p-3 mt-2 mb-1 w-full text-sm placeholder-gray-500 focus:outline-none focus:border-gray-600 focus:ring-0"
                   placeholder="비밀번호"
                 />
                 {formState.password && (
-                  <div className="flex gap-1 mt-2 text-xs lg:text-sm text-red-500">
-                    {pwReg(formState.password) ? '' : <Alert />}
+                  <div className="flex gap-1 text-xs lg:text-sm text-red-500 absolute">
+                    {pwdCheck ? '' : <Alert />}
                     {passwordError}
                   </div>
                 )}
@@ -121,11 +121,10 @@ function Login() {
             <div className="mt-8">
               <button
                 type="submit"
-                className={
-                  isActive
-                    ? 'flex justify-center py-3 items-center w-full rounded-lg bg-orange-400 outline-none text-white font-semibold'
-                    : 'flex justify-center py-3 items-center w-full rounded-lg bg-orange-400 outline-none opacity-50 cursor-not-allowed text-white font-semibold'
-                }
+                disabled={!isActive}
+                className={`flex justify-center py-3 items-center w-full rounded-lg bg-orange-400 outline-none text-white font-semibold ${
+                  isActive ? '' : 'opacity-50 cursor-not-allowed'
+                }`}
               >
                 로그인 하기
               </button>
