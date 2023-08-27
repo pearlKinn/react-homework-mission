@@ -3,13 +3,12 @@ import useFetchData from '@/hooks/useFetchData';
 import filterItemsByState from '@/utils/filterItemsByState';
 import BootCamp from '@/views/BootCamp';
 
-const PB_BOOTCAMP_ENDPOINT =
-  'http://127.0.0.1:8090/api/collections/bootcamp/records';
-
+const PB = import.meta.env.VITE_PB_URL;
+const PB_BOOTCAMP_ENDPOINT = `${PB}/api/collections/bootcamp/records`;
 function Contents({ filterKeyWord = '' }) {
   const { error, data, isLoading } = useFetchData(PB_BOOTCAMP_ENDPOINT);
   let dataItems = data.items;
-  let filteredData = null
+  let filteredData = null;
 
   if (data) {
     if (filterKeyWord.length === 0) {
