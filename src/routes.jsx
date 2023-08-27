@@ -16,12 +16,12 @@ const router = createBrowserRouter(
     <Route path="/" element={<RootLayout />}>
       <Route index element={<Home />} />
       <Route path="login" element={<Login />} />
-      <Route path="users/register" element={<Register />} />
+      <Route path="register" element={<Register />} />
       <Route path="techit" element={<TECHIT />} />
       <Route path="track" element={<Track />} />
       <Route path="station" element={<Station />} />
     </Route>
-  )
+  ),{basename:'/react-homework-mission03'}
 );
 
 export default router;

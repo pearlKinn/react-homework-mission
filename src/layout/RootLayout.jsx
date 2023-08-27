@@ -9,11 +9,11 @@ function RootLayout(props) {
 
   return (
     <div>
-      {(currentPath !== '/login' && currentPath !== '/users/register') && <HeaderBar />}
+      {(currentPath !== '/login' && currentPath !== '/register') && <HeaderBar />}
       <main>
         <Outlet />
       </main>
-      {(currentPath !== '/login' && currentPath !== '/users/register') && <FooterBar />}
+      {(currentPath !== '/login' && currentPath !== '/register') && <FooterBar />}
     </div>
   );
 }

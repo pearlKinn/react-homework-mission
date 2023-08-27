@@ -131,7 +131,7 @@ function Login() {
               <ul className="flex justify-center mt-4">
                 <li className="flex items-center">
                   <Link
-                    to="/users/find-user-email"
+                    to="/find-user-email"
                     className="text-xs text-gray-500 font-medium outline-none"
                   >
                     아이디 찾기
@@ -142,7 +142,7 @@ function Login() {
                 </li>
                 <li className="flex items-center">
                   <Link
-                    to="/users/reset-user-password"
+                    to="/reset-user-password"
                     className="text-xs text-gray-500 font-medium outline-none"
                   >
                     비밀번호 찾기
@@ -153,7 +153,7 @@ function Login() {
                 </li>
                 <li className="flex items-center">
                   <Link
-                    to="/users/register"
+                    to="/register"
                     className="text-xs text-gray-500 font-medium outline-none"
                   >
                     회원가입
